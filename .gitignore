@@ -1,0 +1,4 @@
+.devcontainer/.variables.env
+.tmp/*
+workspace/layer/python
+workspace/layer/layer.zip
