@@ -1,4 +1,7 @@
+.aws-sam
+# make from template
 .devcontainer/.variables.env
+deploy.zsh
+# etc
+.tool-versions
 .tmp/*
-workspace/layer/python
-workspace/layer/layer.zip
