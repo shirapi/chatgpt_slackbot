@@ -31,7 +31,7 @@ Globals:
   #   TracingEnabled: true
 
 Parameters:
-  SigningSecret:
+  SigningSecret2:
     Type: String
     NoEcho: true
   OAuthToken:
