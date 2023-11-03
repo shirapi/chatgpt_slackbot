@@ -10,18 +10,17 @@ env:
 phases:
   install:
     runtime-versions:
-        python: 3.10
+        python: 3.8
   pre_build:
     commands:
       - echo "Pre-build phase"
   build:
     commands:
       - echo "Build phase"
-      - ApiKey=$(aws ssm get-parameters --names $API_KEY --query 'Parameters[0].Value' --output text)
-      - SigningSecret=$(aws ssm get-parameters --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
-      - OAuthToken=$(aws ssm get-parameters --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
-      - ChannelId=$(aws ssm get-parameters --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
-      # - sam package --template-file template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-skjjqchkinms --output-template-file packaged-template.yml
+      - ApiKey=$(aws ssm get-parameters --region ap-northeast-1 --names $API_KEY --query 'Parameters[0].Value' --output text)
+      - SigningSecret=$(aws ssm get-parameters --region ap-northeast-1 --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
+      - OAuthToken=$(aws ssm get-parameters --region ap-northeast-1 --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
+      - ChannelId=$(aws ssm get-parameters --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
       - sam build
   # post_build:
   #   commands:
