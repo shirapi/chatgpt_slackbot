@@ -14,7 +14,7 @@ Globals:
     Timeout: 180
     Environment:
       Variables:
-        SLACK_API_SIGNING_SECRET: !Ref SigningSecret
+        SLACK_API_SIGNING_SECRET: !Ref SigningSecret2
         SLACK_BOT_OAUTH_TOKEN: !Ref OAuthToken
         OPENAI_API_KEY: !Ref ApiKey
         SLACK_CHANNEL_ID: !Ref ChannelId
