@@ -10,7 +10,9 @@ env:
 phases:
   install:
     runtime-versions:
-        python: 3.11
+      python: 3.10
+    commands:
+      - pip install toml
   pre_build:
     commands:
       - echo "Pre-build phase"
