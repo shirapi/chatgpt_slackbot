@@ -20,11 +20,13 @@ phases:
     commands:
       - echo "Build phase"
       - sam build
-      - ApiKey=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names /slackbot/ApiKey --query 'Parameters[0].Value' --output text)
-      # - ApiKey=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $API_KEY --query 'Parameters[0].Value' --output text)
-      - SigningSecret=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
-      - OAuthToken=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
-      - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names /slackbot/ChannelId --query 'Parameters[0].Value' --output text)
-      # - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
-      - echo "channelId $ChannelId"
-      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret} OAuthToken=${OAuthToken} ApiKey=${ApiKey} ChannelId=${ChannelId}  --no-confirm-changeset --no-fail-on-empty-changeset
+      # - ApiKey=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names /slackbot/ApiKey --query 'Parameters[0].Value' --output text)
+      # # - ApiKey=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $API_KEY --query 'Parameters[0].Value' --output text)
+      # - SigningSecret=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
+      # - OAuthToken=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
+      # - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names /slackbot/ChannelId --query 'Parameters[0].Value' --output text)
+      # # - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
+      #
+      - echo "channelId $CHANNEL_ID"
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SIGNING_SECRET} OAuthToken=${OAUTH_TOKEN} ApiKey=${API_KEY} ChannelId=${CHANNEL_ID}  --no-confirm-changeset --no-fail-on-empty-changeset
+      # - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret} OAuthToken=${OAuthToken} ApiKey=${ApiKey} ChannelId=${ChannelId}  --no-confirm-changeset --no-fail-on-empty-changeset
