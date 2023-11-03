@@ -20,16 +20,16 @@ phases:
       - echo "Pre-build phase"
   build:
     commands:
+      - echo "Build phase"
       - ApiKey=$(aws ssm get-parameters --names $ApiKey --query 'Parameters[0].Value' --output text)
       - SigningSecret=$(aws ssm get-parameters --names $SigningSecret --query 'Parameters[0].Value' --output text)
       - OAuthToken=$(aws ssm get-parameters --names $OAuthToken --query 'Parameters[0].Value' --output text)
       - ChannelId=$(aws ssm get-parameters --names $ChannelId --query 'Parameters[0].Value' --output text)
       # - sam package --template-file template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-skjjqchkinms --output-template-file packaged-template.yml
-      - echo "Build phase"
       - sam build
-  post_build:
-    commands:
-      - echo "Post-build phase"
+  # post_build:
+  #   commands:
+  #     - echo "Post-build phase"
       # - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM
       # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
