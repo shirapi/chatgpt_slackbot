@@ -10,7 +10,8 @@ Globals:
     Handler: app.lambda_handler
     Runtime: python3.10
     CodeUri: workspace/
-    MemorySize: 128
+    MemorySize: 256
+    # MemorySize: 128
     Timeout: 180
     Environment:
       Variables:
