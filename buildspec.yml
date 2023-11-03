@@ -3,13 +3,22 @@ phases:
   install:
     runtime-versions:
         python: 3.10
+  pre_build:
+    commands:
+      - echo "Pre-build phase"
   build:
     commands:
       # - sam package --template-file template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-skjjqchkinms --output-template-file packaged-template.yml
+      - echo "Build phase"
       - sam build
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+  post_build:
+    commands:
+      - echo "Post-build phase"
+      # - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM
+      - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
 
 # artifacts:
 #   files:
-#     - packaged-template.yml
+#     - template.yml
 #https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-serverlessrepo-auto-publish.html
