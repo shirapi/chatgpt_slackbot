@@ -8,9 +8,9 @@ env:
     CHANNEL_ID: /slackbot/ChannelId
 
 phases:
-  # install:
-  #   runtime-versions:
-  #       python: 3.10
+  install:
+    runtime-versions:
+        python: 3.10
   pre_build:
     commands:
       - echo "Pre-build phase"
