@@ -11,8 +11,8 @@ phases:
   install:
     runtime-versions:
       python: 3.10
-    commands:
-      - pip install toml
+    # commands:
+    #   - pip install toml
   pre_build:
     commands:
       - echo "Pre-build phase"
@@ -27,6 +27,7 @@ phases:
       # - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names /slackbot/ChannelId --query 'Parameters[0].Value' --output text)
       # # - ChannelId=$(aws ssm get-parameters --with-decryption --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
       #
-      - echo "channelId $CHANNEL_ID"
       - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SIGNING_SECRET} OAuthToken=${OAUTH_TOKEN} ApiKey=${API_KEY} ChannelId=${CHANNEL_ID}  --no-confirm-changeset --no-fail-on-empty-changeset
       # - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret} OAuthToken=${OAuthToken} ApiKey=${ApiKey} ChannelId=${ChannelId}  --no-confirm-changeset --no-fail-on-empty-changeset
+
+# https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html
