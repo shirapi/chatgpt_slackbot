@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-    API_KEY: /slackbot/ApiKey2
+    API_KEY: /slackbot/ApiKey
     SIGNING_SECRET: /slackbot/SigningSecret
     OAUTH_TOKEN: /slackbot/OAuthToken
     CHANNEL_ID: /slackbot/ChannelId
@@ -17,14 +17,10 @@ phases:
   build:
     commands:
       - echo "Build phase"
-      - ApiKey2=$(aws ssm get-parameters --region ap-northeast-1 --names $API_KEY2 --query 'Parameters[0].Value' --output text)
-      - SigningSecret2=$(aws ssm get-parameters --region ap-northeast-1 --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
-      - OAuthToken2=$(aws ssm get-parameters --region ap-northeast-1 --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
-      - ChannelId2=$(aws ssm get-parameters --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
+      - ApiKey=$(aws ssm get-parameters --region ap-northeast-1 --names $API_KEY --query 'Parameters[0].Value' --output text)
+      - SigningSecret=$(aws ssm get-parameters --region ap-northeast-1 --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
+      - OAuthToken=$(aws ssm get-parameters --region ap-northeast-1 --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
+      - ChannelId=$(aws ssm get-parameters --region ap-northeast-1 --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
+      - echo "channelID $ChannelID"
       - sam build
-      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret2=${SigningSecret2} OAuthToken=${OAuthToken2} ApiKey=${ApiKey2} ChannelId=${ChannelId2}
-
-# artifacts:
-#   files:
-#     - template.yml
-#https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-serverlessrepo-auto-publish.html
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret} OAuthToken=${OAuthToken} ApiKey=${ApiKey} ChannelId=${ChannelId}
