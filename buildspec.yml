@@ -18,6 +18,9 @@ phases:
     commands:
       - echo "Build phase"
       - sam build
+  post_build:
+    commands:
+      - echo "Post-build phase"
       - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SIGNING_SECRET} OAuthToken=${OAUTH_TOKEN} ApiKey=${API_KEY} ChannelId=${CHANNEL_ID}  --no-confirm-changeset --no-fail-on-empty-changeset
 
 # https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html

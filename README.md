@@ -9,7 +9,7 @@
     * Lambdaのランタイムは Python 3.10
     * OpenAIなどのライブラリはlayerとする
     * SlackのSecretなどは環境変数で管理
-    * deployはAWS SAMで実行する
+    * deployはCodePipeline + AWS SAMで実行する
 * Botにメンションして発言すると応答してくれる
 * 応答するのに時間がかかるので、Botは発言に対して先にリアクションをつける
 * スレッドの内容は記憶がある状態で話ができる
