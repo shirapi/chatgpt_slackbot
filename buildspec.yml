@@ -1,13 +1,29 @@
 version: 0.2
+
+env:
+  parameter-store:
+    ApiKey: /slackbot/ApiKey
+    SigningSecret: /slackbot/SigningSecret
+    OAuthToken: /slackbot/OAuthToken
+    ChannelId: /slackbot/ChannelId
+
 phases:
   install:
     runtime-versions:
         python: 3.10
+    commands:
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set region $AWS_DEFAULT_REGION
   pre_build:
     commands:
       - echo "Pre-build phase"
   build:
     commands:
+      - ApiKey=$(aws ssm get-parameters --names $ApiKey --query 'Parameters[0].Value' --output text)
+      - SigningSecret=$(aws ssm get-parameters --names $SigningSecret --query 'Parameters[0].Value' --output text)
+      - OAuthToken=$(aws ssm get-parameters --names $OAuthToken --query 'Parameters[0].Value' --output text)
+      - ChannelId=$(aws ssm get-parameters --names $ChannelId --query 'Parameters[0].Value' --output text)
       # - sam package --template-file template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-skjjqchkinms --output-template-file packaged-template.yml
       - echo "Build phase"
       - sam build
@@ -16,7 +32,8 @@ phases:
       - echo "Post-build phase"
       # - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM
-      - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
+      # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret} OAuthToken=${OAuthToken} ApiKey=${ApiKey} ChannelId=${ChannelId}
 
 # artifacts:
 #   files:

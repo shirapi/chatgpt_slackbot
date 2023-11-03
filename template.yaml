@@ -2,8 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   slackbot
-
-  Sample SAM Template for slackbot
+  SAM Template for slackbot
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -15,10 +14,14 @@ Globals:
     Timeout: 180
     Environment:
       Variables:
-        SLACK_API_SIGNING_SECRET: "{{resolve:secretsmanager:HiyokoSecret:SecretString:SigningSecret}}"
-        SLACK_BOT_OAUTH_TOKEN: "{{resolve:secretsmanager:HiyokoSecret:SecretString:OAuthToken}}"
-        OPENAI_API_KEY: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ApiKey}}"
-        SLACK_CHANNEL_ID: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ChannelId}}"
+        SLACK_API_SIGNING_SECRET: !Ref SigningSecret
+        SLACK_BOT_OAUTH_TOKEN: !Ref OAuthToken
+        OPENAI_API_KEY: !Ref ApiKey
+        SLACK_CHANNEL_ID: !Ref ChannelId
+        # SLACK_API_SIGNING_SECRET: "{{resolve:secretsmanager:HiyokoSecret:SecretString:SigningSecret}}"
+        # SLACK_BOT_OAUTH_TOKEN: "{{resolve:secretsmanager:HiyokoSecret:SecretString:OAuthToken}}"
+        # OPENAI_API_KEY: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ApiKey}}"
+        # SLACK_CHANNEL_ID: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ChannelId}}"
     Tracing: Active
     Architectures:
       - x86_64
@@ -84,17 +87,17 @@ Resources:
     Properties:
       AutoConfigurationEnabled: true
       ResourceGroupName: !Ref ApplicationResourceGroup
-  HiyokoSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: HiyokoSecret
-      Description: hiyoko-secret
-      SecretString: !Sub '{"SigningSecret":"${SigningSecret}","OAuthToken":"${OAuthToken}","ApiKey":"${ApiKey}","ChannelId":"${ChannelId}"}'
-      Tags:
-        - Key: Name
-          Value: !Sub hiyoko-secret
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+  # HiyokoSecret:
+  #   Type: AWS::SecretsManager::Secret
+  #   Properties:
+  #     Name: HiyokoSecret
+  #     Description: hiyoko-secret
+  #     SecretString: !Sub '{"SigningSecret":"${SigningSecret}","OAuthToken":"${OAuthToken}","ApiKey":"${ApiKey}","ChannelId":"${ChannelId}"}'
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub hiyoko-secret
+  #   UpdateReplacePolicy: Delete
+  #   DeletionPolicy: Delete
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
