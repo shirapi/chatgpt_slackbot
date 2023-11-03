@@ -2,29 +2,25 @@ version: 0.2
 
 env:
   parameter-store:
-    ApiKey: /slackbot/ApiKey
-    SigningSecret: /slackbot/SigningSecret
-    OAuthToken: /slackbot/OAuthToken
-    ChannelId: /slackbot/ChannelId
+    API_KEY: /slackbot/ApiKey
+    SIGNING_SECRET: /slackbot/SigningSecret
+    OAUTH_TOKEN: /slackbot/OAuthToken
+    CHANNEL_ID: /slackbot/ChannelId
 
 phases:
   install:
     runtime-versions:
         python: 3.10
-    commands:
-      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      - aws configure set region $AWS_DEFAULT_REGION
   pre_build:
     commands:
       - echo "Pre-build phase"
   build:
     commands:
       - echo "Build phase"
-      - ApiKey=$(aws ssm get-parameters --names $ApiKey --query 'Parameters[0].Value' --output text)
-      - SigningSecret=$(aws ssm get-parameters --names $SigningSecret --query 'Parameters[0].Value' --output text)
-      - OAuthToken=$(aws ssm get-parameters --names $OAuthToken --query 'Parameters[0].Value' --output text)
-      - ChannelId=$(aws ssm get-parameters --names $ChannelId --query 'Parameters[0].Value' --output text)
+      - ApiKey=$(aws ssm get-parameters --names $API_KEY --query 'Parameters[0].Value' --output text)
+      - SigningSecret=$(aws ssm get-parameters --names $SIGNING_SECRET --query 'Parameters[0].Value' --output text)
+      - OAuthToken=$(aws ssm get-parameters --names $OAUTH_TOKEN --query 'Parameters[0].Value' --output text)
+      - ChannelId=$(aws ssm get-parameters --names $CHANNEL_ID --query 'Parameters[0].Value' --output text)
       # - sam package --template-file template.yml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-skjjqchkinms --output-template-file packaged-template.yml
       - sam build
   # post_build:
