@@ -154,7 +154,7 @@ def command_handler(body, say, context, ack):
         ]
     )
     prompt.input_variables = ['input', 'history']
-    # print(f'prompt= {prompt}')
+    print(f'prompt= {prompt}')
 
     # 過去の会話を取得
     thread_ts = timestamp
