@@ -28,7 +28,7 @@ phases:
       # - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM
       # - sam deploy --template-file template.yaml --stack-name slackbot --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
-      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret=${SigningSecret2} OAuthToken=${OAuthToken2} ApiKey=${ApiKey2} ChannelId=${ChannelId2}
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides SigningSecret2=${SigningSecret2} OAuthToken=${OAuthToken2} ApiKey=${ApiKey2} ChannelId=${ChannelId2}
 
 # artifacts:
 #   files:
