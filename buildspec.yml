@@ -5,7 +5,7 @@ env:
     API_KEY: /slackbot/ApiKey
     CHANNEL_ID: /slackbot/ChannelId
     SIGNING_SECRET_GPT3: /slackbot/SigningSecret/GPT3
-    OAUTH_TOKENG_PT3: /slackbot/OAuthToken/GPT3
+    OAUTH_TOKENG_GPT3: /slackbot/OAuthToken/GPT3
     SIGNING_SECRET_GPT4: /slackbot/SigningSecret/GPT4
     OAUTH_TOKEN_GPT4: /slackbot/OAuthToken/GPT4
     SIGNING_SECRET_CLAUDE1: /slackbot/SigningSecret/Claude1
