@@ -15,8 +15,6 @@ Globals:
     Timeout: 180
     Environment:
       Variables:
-        SLACK_API_SIGNING_SECRET: !Ref SigningSecret
-        SLACK_BOT_OAUTH_TOKEN: !Ref OAuthToken
         OPENAI_API_KEY: !Ref ApiKey
         SLACK_CHANNEL_ID: !Ref ChannelId
         # SLACK_API_SIGNING_SECRET: "{{resolve:secretsmanager:HiyokoSecret:SecretString:SigningSecret}}"
@@ -32,18 +30,47 @@ Globals:
   #   TracingEnabled: true
 
 Parameters:
-  SigningSecret:
-    Type: String
-    NoEcho: true
-  OAuthToken:
-    Type: String
-    NoEcho: true
   ApiKey:
     Type: String
     NoEcho: true
   ChannelId:
     Type: String
     NoEcho: true
+  SigningSecretGPT3:
+    Type: String
+    NoEcho: true
+  OAuthTokenGPT3:
+    Type: String
+    NoEcho: true
+  SigningSecretGPT4:
+    Type: String
+    NoEcho: true
+  OAuthTokenGPT4:
+    Type: String
+    NoEcho: true
+  SigningSecretClaude1:
+    Type: String
+    NoEcho: true
+  OAuthTokenClaude1:
+    Type: String
+    NoEcho: true
+  SigningSecretClaude2:
+    Type: String
+    NoEcho: true
+  OAuthTokenClaude2:
+    Type: String
+    NoEcho: true
+
+Mappings:
+  env:
+    GPT3:
+      AIModel: 'gpt-3.5-turbo'
+    GPT4:
+      AIModel: 'gpt-4'
+    Claude1:
+      AIModel: 'anthropic.claude-instant-v1'
+    Claude2:
+      AIModel: 'anthropic.claude-v2'
 
 Resources:
   # SlackbotAPI:
@@ -55,6 +82,39 @@ Resources:
   #       Type: Region
   #     Auth:
   #       ApiKeyRequired: false
+  HiyokoCommonFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: lambda.amazonaws.com
+      Policies:
+        - PolicyName: "hiyoko-common-function-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "xray:PutTraceSegments"
+                  - "xray:PutTelemetryRecords"
+                  - "xray:GetSamplingRules"
+                  - "xray:GetSamplingTargets"
+                  - "xray:GetSamplingStatisticSummaries"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "bedrock:*"
+                Resource: "*"
   HiyokoFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -68,6 +128,67 @@ Resources:
       #       # RestApiId: !Ref SlackbotAPI
       FunctionUrlConfig:
         AuthType: NONE
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretGPT3
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenGPT3
+          AI_MODEL: !FindInMap [env, GPT3, AIModel]
+  GPT4HiyokoFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: slackbot-GPT4HiyokoFunction
+      # Events:
+      #   CatchAll:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /hello
+      #       Method: get
+      #       # RestApiId: !Ref SlackbotAPI
+      FunctionUrlConfig:
+        AuthType: NONE
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretGPT4
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenGPT4
+          AI_MODEL: !FindInMap [env, GPT4, AIModel]
+  Claude1HiyokoFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: slackbot-Claude1HiyokoFunction
+      # Events:
+      #   CatchAll:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /hello
+      #       Method: get
+      #       # RestApiId: !Ref SlackbotAPI
+      FunctionUrlConfig:
+        AuthType: NONE
+      Role: !GetAtt HiyokoCommonFunctionRole.Arn
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretClaude1
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenClaude1
+          AI_MODEL: !FindInMap [env, Claude1, AIModel]
+  Claude2HiyokoFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: slackbot-Claude2HiyokoFunction
+      # Events:
+      #   CatchAll:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /hello
+      #       Method: get
+      #       # RestApiId: !Ref SlackbotAPI
+      FunctionUrlConfig:
+        AuthType: NONE
+      Role: !GetAtt HiyokoCommonFunctionRole.Arn
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretClaude2
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenClaude2
+          AI_MODEL: !FindInMap [env, Claude2, AIModel]
   HiyokoLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -113,5 +234,14 @@ Outputs:
   #   Description: Implicit IAM Role created for Hiyoko function
   #   Value: !GetAtt HiyokoFunctionRole.Arn
   HiyokoFunctionUrl:
-    Description: "Function URLs endpoint"
+    Description: "HiyokoFunction URLs endpoint"
     Value: !GetAtt HiyokoFunctionUrl.FunctionUrl
+  GPT4HiyokoFunctionUrl:
+    Description: "GPT4HiyokoFunction URLs endpoint"
+    Value: !GetAtt GPT4HiyokoFunctionUrl.FunctionUrl
+  Claude1HiyokoFunctionUrl:
+    Description: "Claude1HiyokoFunction URLs endpoint"
+    Value: !GetAtt Claude1HiyokoFunctionUrl.FunctionUrl
+  Claude2HiyokoFunctionUrl:
+    Description: "Claude2HiyokoFunction URLs endpoint"
+    Value: !GetAtt Claude2HiyokoFunctionUrl.FunctionUrl

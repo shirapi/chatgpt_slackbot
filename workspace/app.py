@@ -4,8 +4,6 @@ import openai
 import re
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
-from langchain import PromptTemplate 
-from langchain.llms import Bedrock
 from langchain.chat_models import (
     ChatOpenAI,
     BedrockChat
@@ -16,17 +14,18 @@ from langchain.memory import (
     ConversationSummaryBufferMemory,
     ChatMessageHistory
 )
+from langchain.prompts import PromptTemplate
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-from boto3.session import Session
 
 signing_secret = os.environ.get('SLACK_API_SIGNING_SECRET')
 token=os.environ.get("SLACK_BOT_OAUTH_TOKEN")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 channel_id = os.environ.get('SLACK_CHANNEL_ID')
+ai_model = os.environ.get('AI_MODEL')
 
 app = App(
     process_before_response=True,
@@ -149,17 +148,29 @@ def command_handler(body, say, context, ack):
     # 受信メッセージの取得
     text = get_user_text(event.get('text'))
 
-    # # OpenAI API model
-    # llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0.6, verbose=True)
-    # Bedrock
-    session = Session(profile_name="bedrock")
-    bedrock_runtime = session.client("bedrock-runtime", region_name="ap-northeast-1")
-    llm = BedrockChat(
-        client=bedrock_runtime,
-        model_id="anthropic.claude-v2",
-        model_kwargs={"temperature": 0.6},
-        verbose=True
-    )
+    llm = None
+    if ai_model == 'anthropic.claude-instant-v1':
+        # Bedrock Claude instant v1.2
+        llm = BedrockChat(
+            region_name="ap-northeast-1",
+            model_id=ai_model,
+            model_kwargs={"temperature": 0.6},
+            verbose=True
+        )
+    elif ai_model == 'anthropic.claude-v2':
+        # Bedrock Claude v2
+        llm = BedrockChat(
+            region_name="us-east-1",
+            model_id=ai_model,
+            model_kwargs={"temperature": 0.6},
+            verbose=True
+        )
+    elif ai_model == 'gpt-3.5-turbo' or ai_model == 'gpt-4':
+        # OpenAI API
+        llm = ChatOpenAI(model_name=ai_model, temperature=0.6, verbose=True)
+    else:
+        post_message(event, say, 'AIに異常が生じているぴよ！')
+        return
 
     prompt = ChatPromptTemplate.from_messages(
         [
