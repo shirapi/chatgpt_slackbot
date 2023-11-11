@@ -4,14 +4,14 @@ env:
   parameter-store:
     API_KEY: /slackbot/ApiKey
     CHANNEL_ID: /slackbot/ChannelId
-    SIGNING_SECRET_GPT3: /slackbot/SigningSecretGPT3
-    OAUTH_TOKENG_PT3: /slackbot/OAuthTokenGPT3
-    SIGNING_SECRET_GPT4: /slackbot/SigningSecretGPT4
-    OAUTH_TOKEN_GPT4: /slackbot/OAuthTokenGPT4
-    SIGNING_SECRET_CLAUDE1: /slackbot/SigningSecretClaude1
-    OAUTH_TOKEN_CLAUDE1: /slackbot/OAuthTokenClaude1
-    SIGNING_SECRET_CLAUDE2: /slackbot/SigningSecretClaude2
-    OAUTH_TOKEN_CLAUDE2: /slackbot/OAuthTokenClaude2
+    SIGNING_SECRET_GPT3: /slackbot/SigningSecret/GPT3
+    OAUTH_TOKENG_PT3: /slackbot/OAuthToken/GPT3
+    SIGNING_SECRET_GPT4: /slackbot/SigningSecret/GPT4
+    OAUTH_TOKEN_GPT4: /slackbot/OAuthToken/GPT4
+    SIGNING_SECRET_CLAUDE1: /slackbot/SigningSecret/Claude1
+    OAUTH_TOKEN_CLAUDE1: /slackbot/OAuthToken/Claude1
+    SIGNING_SECRET_CLAUDE2: /slackbot/SigningSecret/Claude2
+    OAUTH_TOKEN_CLAUDE2: /slackbot/OAuthToken/Claude2
 
 phases:
   install:
