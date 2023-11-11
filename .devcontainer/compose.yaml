@@ -10,8 +10,5 @@ services:
       - type: bind
         source: ../workspace
         target: /workspace
-      - type: bind
-        source: requirements.txt
-        target: /workspace/layer/requirements.txt
     env_file:
       - ./.variables.env

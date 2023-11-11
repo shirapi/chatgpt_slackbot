@@ -9,10 +9,11 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends vim curl zip unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
-    && mkdir /workspace
+    && mkdir /workspace \
+    && mkdir /install
 
-WORKDIR /workspace
-COPY requirements.txt /workspace/
+WORKDIR /install
+COPY requirements.txt /install/
 # hadolint ignore=DL3013
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt

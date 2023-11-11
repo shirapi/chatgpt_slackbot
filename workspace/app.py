@@ -5,7 +5,11 @@ import re
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 from langchain import PromptTemplate 
-from langchain.chat_models import ChatOpenAI
+from langchain.llms import Bedrock
+from langchain.chat_models import (
+    ChatOpenAI,
+    BedrockChat
+)
 from langchain.chains import ConversationChain
 from langchain.memory import (
     ConversationBufferMemory,
@@ -17,6 +21,7 @@ from langchain.prompts.chat import (
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
+from boto3.session import Session
 
 signing_secret = os.environ.get('SLACK_API_SIGNING_SECRET')
 token=os.environ.get("SLACK_BOT_OAUTH_TOKEN")
@@ -144,8 +149,17 @@ def command_handler(body, say, context, ack):
     # 受信メッセージの取得
     text = get_user_text(event.get('text'))
 
-    # OpenAI API model
-    llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0.6, verbose=True)
+    # # OpenAI API model
+    # llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0.6, verbose=True)
+    # Bedrock
+    session = Session(profile_name="bedrock")
+    bedrock_runtime = session.client("bedrock-runtime", region_name="ap-northeast-1")
+    llm = BedrockChat(
+        client=bedrock_runtime,
+        model_id="anthropic.claude-v2",
+        model_kwargs={"temperature": 0.6},
+        verbose=True
+    )
 
     prompt = ChatPromptTemplate.from_messages(
         [
