@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.13
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED 1
@@ -12,8 +12,12 @@ RUN apt-get update \
     && mkdir /workspace \
     && mkdir /install
 
+COPY --from=ghcr.io/astral-sh/uv:0.12.3 /uv /usr/local/bin/uv
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+ENV UV_LINK_MODE=copy
+ENV PATH="/opt/venv/bin:$PATH"
+
 WORKDIR /install
-COPY requirements.txt /install/
-# hadolint ignore=DL3013
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock /install/
+RUN uv sync --frozen --no-install-project

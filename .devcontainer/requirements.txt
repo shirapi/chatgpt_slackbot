@@ -1,8 +1,0 @@
-slack_bolt
-aiohttp
-boto3
-openai
-langchain
-requests==2.28.1
-charset-normalizer<3,>=2
-tiktoken

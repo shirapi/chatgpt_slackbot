@@ -3,8 +3,8 @@ services:
     container_name: slackbot_app
     image: slackbot_app
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
     tty: true
     volumes:
       - type: bind
