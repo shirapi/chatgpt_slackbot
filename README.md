@@ -1,8 +1,5 @@
-## ChatGPTを搭載したSlackbot
-* TODO
-    * CodePipelineを構築し、mainブランチにpushでデプロイする
-    * Amazon Bedrockを利用してみる(モデルはclaude2など)
-    * FunctionsURLからAPI Gatewayに変更
+## ChatGPT / Claudeを搭載したSlackbot
+**メンテナンス終了。依存ライブラリの更新等により動作しない可能性がある**
 
 ### 仕様
 * Botを使用できるのは特定のオープンチャンネルに限定する。
@@ -13,9 +10,11 @@
 * スレッドの内容に関してはBotは記憶がある状態で話ができる。
 
 ### 構成
-* Lambda + Lambda FunctionsURL + Slack Bolt(python) + ChatGPT + LangChain(python)
-    * Lambdaランタイム: Python 3.10
-    * OpenAIなどのライブラリはlayerとして実装
+* Lambda + Lambda FunctionsURL + Slack Bolt(python) + OpenAI API(ChatGPT) + Amazon Bedrock(Claude) + LangChain(python)
+    * Lambdaランタイム: Python 3.13
+    * FunctionはChatGPT用とClaude用の2つ(Slackアプリも2つ)
+    * 使用するモデルはtemplate.yamlのMappingsで指定
+    * Slack Bolt・LangChainなどのライブラリはlayerとして実装
     * SlackのSecretなどは環境変数で管理
     * CodePipeline + AWS SAMでデプロイする
 

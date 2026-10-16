@@ -2,58 +2,48 @@
 
 echo "環境変数を指定してください"
 
+# 秘密値は入力を画面に表示しない
 while [[ -z "$ApiKey" ]]; do
-    vared -p "OPENAI_API_KEY": -c ApiKey
+    read -s -r "?OPENAI_API_KEY: " ApiKey; echo
 done
 
 while [[ -z "$ChannelId" ]]; do
     vared -p "SLACK_CHANNEL_ID": -c ChannelId
 done
 
-while [[ -z "$SigningSecretGPT3" ]]; do
-    vared -p "SLACK_API_SIGNING_SECRET_GPT3": -c SigningSecretGPT3
+while [[ -z "$SigningSecretChatGPT" ]]; do
+    read -s -r "?SLACK_API_SIGNING_SECRET_CHATGPT: " SigningSecretChatGPT; echo
 done
 
-while [[ -z "$OAuthTokenGPT3" ]]; do
-    vared -p "SLACK_BOT_OAUTH_TOKEN_GPT3": -c OAuthTokenGPT3
+while [[ -z "$OAuthTokenChatGPT" ]]; do
+    read -s -r "?SLACK_BOT_OAUTH_TOKEN_CHATGPT: " OAuthTokenChatGPT; echo
 done
 
-while [[ -z "$SigningSecretGPT4" ]]; do
-    vared -p "SLACK_API_SIGNING_SECRET_GPT4": -c SigningSecretGPT4
+while [[ -z "$SigningSecretClaude" ]]; do
+    read -s -r "?SLACK_API_SIGNING_SECRET_CLAUDE: " SigningSecretClaude; echo
 done
 
-while [[ -z "$OAuthTokenGPT4" ]]; do
-    vared -p "SLACK_BOT_OAUTH_TOKEN_GPT4": -c OAuthTokenGPT4
+while [[ -z "$OAuthTokenClaude" ]]; do
+    read -s -r "?SLACK_BOT_OAUTH_TOKEN_CLAUDE: " OAuthTokenClaude; echo
 done
 
-while [[ -z "$SigningSecretClaude1" ]]; do
-    vared -p "SLACK_API_SIGNING_SECRET_CLAUDE1": -c SigningSecretClaude1
-done
-
-while [[ -z "$OAuthTokenClaude1" ]]; do
-    vared -p "SLACK_BOT_OAUTH_TOKEN_CLAUDE1": -c OAuthTokenClaude1
-done
-
-while [[ -z "$SigningSecretClaude2" ]]; do
-    vared -p "SLACK_API_SIGNING_SECRET_CLAUDE2": -c SigningSecretClaude2
-done
-
-while [[ -z "$OAuthTokenClaude2" ]]; do
-    vared -p "SLACK_BOT_OAUTH_TOKEN_CLAUDE2": -c OAuthTokenClaude2
-done
+# 末尾4文字だけ表示する（4文字以下なら全て伏せる）
+mask() {
+    if (( ${#1} > 4 )); then
+        echo "********${1[-4,-1]}"
+    else
+        echo "********"
+    fi
+}
 
 echo "=== deploy info ==="
 echo " "
-echo "ApiKey: $ApiKey"
+echo "ApiKey: $(mask $ApiKey)"
 echo "ChannelId: $ChannelId"
-echo "SigningSecretGPT3: $SigningSecretGPT3"
-echo "OAuthTokenGPT3: $OAuthTokenGPT3"
-echo "SigningSecretGPT4: $SigningSecretGPT4"
-echo "OAuthTokenGPT4: $OAuthTokenGPT4"
-echo "SigningSecretClaude1: $SigningSecretClaude1"
-echo "OAuthTokenClaude1: $OAuthTokenClaude1"
-echo "SigningSecretClaude2: $SigningSecretClaude2"
-echo "OAuthTokenClaude2: $OAuthTokenClaude2"
+echo "SigningSecretChatGPT: $(mask $SigningSecretChatGPT)"
+echo "OAuthTokenChatGPT: $(mask $OAuthTokenChatGPT)"
+echo "SigningSecretClaude: $(mask $SigningSecretClaude)"
+echo "OAuthTokenClaude: $(mask $OAuthTokenClaude)"
 echo "==================="
 echo " "
 
@@ -65,7 +55,5 @@ sam build && sam deploy \
     --stack-name slackbot \
     --region ap-northeast-1 \
     --parameter-overrides ApiKey=${ApiKey} ChannelId=${ChannelId} \
-    SigningSecretGPT3=${SigningSecretGPT3} OAuthTokenGPT3=${OAuthTokenGPT3} \
-    SigningSecretGPT4=${SigningSecretGPT4} OAuthTokenGPT4=${OAuthTokenGPT4} \
-    SigningSecretClaude1=${SigningSecretClaude1} OAuthTokenClaude1=${OAuthTokenClaude1} \
-    SigningSecretClaude2=${SigningSecretClaude2} OAuthTokenClaude2=${OAuthTokenClaude2}
+    SigningSecretChatGPT=${SigningSecretChatGPT} OAuthTokenChatGPT=${OAuthTokenChatGPT} \
+    SigningSecretClaude=${SigningSecretClaude} OAuthTokenClaude=${OAuthTokenClaude}
