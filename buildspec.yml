@@ -4,19 +4,15 @@ env:
   parameter-store:
     API_KEY: /slackbot/ApiKey
     CHANNEL_ID: /slackbot/ChannelId
-    SIGNING_SECRET_GPT3: /slackbot/SigningSecret/GPT3
-    OAUTH_TOKEN_GPT3: /slackbot/OAuthToken/GPT3
-    SIGNING_SECRET_GPT4: /slackbot/SigningSecret/GPT4
-    OAUTH_TOKEN_GPT4: /slackbot/OAuthToken/GPT4
-    SIGNING_SECRET_CLAUDE1: /slackbot/SigningSecret/Claude1
-    OAUTH_TOKEN_CLAUDE1: /slackbot/OAuthToken/Claude1
-    SIGNING_SECRET_CLAUDE2: /slackbot/SigningSecret/Claude2
-    OAUTH_TOKEN_CLAUDE2: /slackbot/OAuthToken/Claude2
+    SIGNING_SECRET_CHATGPT: /slackbot/SigningSecret/ChatGPT
+    OAUTH_TOKEN_CHATGPT: /slackbot/OAuthToken/ChatGPT
+    SIGNING_SECRET_CLAUDE: /slackbot/SigningSecret/Claude
+    OAUTH_TOKEN_CLAUDE: /slackbot/OAuthToken/Claude
 
 phases:
   install:
     runtime-versions:
-      python: 3.10
+      python: 3.13
   pre_build:
     commands:
       - echo "Pre-build phase"
@@ -27,6 +23,6 @@ phases:
   post_build:
     commands:
       - echo "Post-build phase"
-      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides ApiKey=${API_KEY} ChannelId=${CHANNEL_ID} SigningSecretGPT3=${SIGNING_SECRET_GPT3} OAuthTokenGPT3=${OAUTH_TOKEN_GPT3} SigningSecretGPT4=${SIGNING_SECRET_GPT4} OAuthTokenGPT4=${OAUTH_TOKEN_GPT4} SigningSecretClaude1=${SIGNING_SECRET_CLAUDE1} OAuthTokenClaude1=${OAUTH_TOKEN_CLAUDE1} SigningSecretClaude2=${SIGNING_SECRET_CLAUDE2} OAuthTokenClaude2=${OAUTH_TOKEN_CLAUDE2} --no-confirm-changeset --no-fail-on-empty-changeset
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides ApiKey=${API_KEY} ChannelId=${CHANNEL_ID} SigningSecretChatGPT=${SIGNING_SECRET_CHATGPT} OAuthTokenChatGPT=${OAUTH_TOKEN_CHATGPT} SigningSecretClaude=${SIGNING_SECRET_CLAUDE} OAuthTokenClaude=${OAUTH_TOKEN_CLAUDE} --no-confirm-changeset --no-fail-on-empty-changeset
 
 # https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html

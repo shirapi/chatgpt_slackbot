@@ -11,6 +11,8 @@ dependencies = [
     "langchain",
     "requests",
     "tiktoken",
+    "langchain-openai>=1.6.7",
+    "langchain-aws>=1.8.1",
 ]
 
 [tool.uv]
