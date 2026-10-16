@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  parameter-store:
+    API_KEY: /slackbot/ApiKey
+    CHANNEL_ID: /slackbot/ChannelId
+    SIGNING_SECRET_CHATGPT: /slackbot/SigningSecret/ChatGPT
+    OAUTH_TOKEN_CHATGPT: /slackbot/OAuthToken/ChatGPT
+    SIGNING_SECRET_CLAUDE: /slackbot/SigningSecret/Claude
+    OAUTH_TOKEN_CLAUDE: /slackbot/OAuthToken/Claude
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.13
+  pre_build:
+    commands:
+      - echo "Pre-build phase"
+  build:
+    commands:
+      - echo "Build phase"
+      - sam build
+  post_build:
+    commands:
+      - echo "Post-build phase"
+      - sam deploy --stack-name slackbot --region ap-northeast-1 --parameter-overrides ApiKey=${API_KEY} ChannelId=${CHANNEL_ID} SigningSecretChatGPT=${SIGNING_SECRET_CHATGPT} OAuthTokenChatGPT=${OAUTH_TOKEN_CHATGPT} SigningSecretClaude=${SIGNING_SECRET_CLAUDE} OAuthTokenClaude=${OAUTH_TOKEN_CLAUDE} --no-confirm-changeset --no-fail-on-empty-changeset
+
+# https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html

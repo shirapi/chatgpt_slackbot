@@ -2,77 +2,126 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   slackbot
-
-  Sample SAM Template for slackbot
+  SAM Template for slackbot
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Handler: app.lambda_handler
-    Runtime: python3.10
+    Runtime: python3.13
     CodeUri: workspace/
-    MemorySize: 128
+    MemorySize: 256
     Timeout: 180
     Environment:
       Variables:
-        SLACK_API_SIGNING_SECRET: "{{resolve:secretsmanager:HiyokoSecret:SecretString:SigningSecret}}"
-        SLACK_BOT_OAUTH_TOKEN: "{{resolve:secretsmanager:HiyokoSecret:SecretString:OAuthToken}}"
-        OPENAI_API_KEY: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ApiKey}}"
-        SLACK_CHANNEL_ID: "{{resolve:secretsmanager:HiyokoSecret:SecretString:ChannelId}}"
+        SLACK_CHANNEL_ID: !Ref ChannelId
     Tracing: Active
     Architectures:
       - x86_64
     Layers:
-      - !Ref HiyokoLayer
+      - !Ref DependencyLayer
   # Api:
   #   TracingEnabled: true
 
 Parameters:
-  SigningSecret:
-    Type: String
-    NoEcho: true
-  OAuthToken:
-    Type: String
-    NoEcho: true
   ApiKey:
     Type: String
     NoEcho: true
   ChannelId:
     Type: String
     NoEcho: true
+  SigningSecretChatGPT:
+    Type: String
+    NoEcho: true
+  OAuthTokenChatGPT:
+    Type: String
+    NoEcho: true
+  SigningSecretClaude:
+    Type: String
+    NoEcho: true
+  OAuthTokenClaude:
+    Type: String
+    NoEcho: true
+
+Mappings:
+  env:
+    ChatGPT:
+      AIModel: 'gpt-5.6-luna'
+    Claude:
+      AIModel: 'global.anthropic.claude-sonnet-4-6'
+      # IAMポリシー用。AIModelからglobal.を除いたもの
+      FoundationModel: 'anthropic.claude-sonnet-4-6'
 
 Resources:
-  # SlackbotAPI:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: slackbot-api
-  #     StageName: Prod
-  #     EndpointConfiguration:
-  #       Type: Region
-  #     Auth:
-  #       ApiKeyRequired: false
-  HiyokoFunction:
+  ChatGPTAgentFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: slackbot-HiyokoFunction
-      # Events:
-      #   CatchAll:
-      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-      #     Properties:
-      #       Path: /hello
-      #       Method: get
-      #       # RestApiId: !Ref SlackbotAPI
+      FunctionName: slackbot-ChatGPTAgentFunction
       FunctionUrlConfig:
         AuthType: NONE
-  HiyokoLayer:
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretChatGPT
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenChatGPT
+          AI_MODEL: !FindInMap [env, ChatGPT, AIModel]
+          OPENAI_API_KEY: !Ref ApiKey
+  ClaudeAgentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: slackbot-ClaudeAgentFunction
+      FunctionUrlConfig:
+        AuthType: NONE
+      # global推論プロファイルの呼び出しには3つのリソースへの許可が必要
+      # https://docs.aws.amazon.com/bedrock/latest/userguide/global-cross-region-inference.html
+      Policies:
+        - Statement:
+            # 推論プロファイル
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: !Sub
+                - arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${Profile}
+                - Profile: !FindInMap [env, Claude, AIModel]
+              Condition:
+                StringEquals:
+                  aws:RequestedRegion: !Ref AWS::Region
+            # 呼び出し元リージョンのモデル本体
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: !Sub
+                - arn:aws:bedrock:${AWS::Region}::foundation-model/${Model}
+                - Model: !FindInMap [env, Claude, FoundationModel]
+              Condition:
+                StringEquals:
+                  aws:RequestedRegion: !Ref AWS::Region
+                  bedrock:InferenceProfileArn: !Sub
+                    - arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${Profile}
+                    - Profile: !FindInMap [env, Claude, AIModel]
+            # グローバルのモデル本体（リージョン・アカウントなしのARN）
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: !Sub
+                - arn:aws:bedrock:::foundation-model/${Model}
+                - Model: !FindInMap [env, Claude, FoundationModel]
+              Condition:
+                StringEquals:
+                  aws:RequestedRegion: unspecified
+                  bedrock:InferenceProfileArn: !Sub
+                    - arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${Profile}
+                    - Profile: !FindInMap [env, Claude, AIModel]
+      Environment:
+        Variables:
+          SLACK_API_SIGNING_SECRET: !Ref SigningSecretClaude
+          SLACK_BOT_OAUTH_TOKEN: !Ref OAuthTokenClaude
+          AI_MODEL: !FindInMap [env, Claude, AIModel]
+  DependencyLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      Description: for HiyokoFunction
+      Description: dependencies for slackbot functions
       ContentUri: 'layer/'
       CompatibleRuntimes:
-        - python3.10
+        - python3.13
     Metadata:
-      BuildMethod: python3.10
+      BuildMethod: python3.13
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -84,30 +133,10 @@ Resources:
     Properties:
       AutoConfigurationEnabled: true
       ResourceGroupName: !Ref ApplicationResourceGroup
-  HiyokoSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: HiyokoSecret
-      Description: hiyoko-secret
-      SecretString: !Sub '{"SigningSecret":"${SigningSecret}","OAuthToken":"${OAuthToken}","ApiKey":"${ApiKey}","ChannelId":"${ChannelId}"}'
-      Tags:
-        - Key: Name
-          Value: !Sub hiyoko-secret
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  # HiyokoApi:
-  #   Description: "API Gateway endpoint URL for Prod stage for Hiyoko function"
-  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  # HiyokoFunction:
-  #   Description: Hiyoko Lambda Function ARN
-  #   Value: !GetAtt HiyokoFunction.Arn
-  # HiyokoFunctionIamRole:
-  #   Description: Implicit IAM Role created for Hiyoko function
-  #   Value: !GetAtt HiyokoFunctionRole.Arn
-  HiyokoFunctionUrl:
-    Description: "Function URLs endpoint"
-    Value: !GetAtt HiyokoFunctionUrl.FunctionUrl
+  ChatGPTAgentFunctionUrl:
+    Description: "ChatGPTAgentFunction URLs endpoint"
+    Value: !GetAtt ChatGPTAgentFunctionUrl.FunctionUrl
+  ClaudeAgentFunctionUrl:
+    Description: "ClaudeAgentFunction URLs endpoint"
+    Value: !GetAtt ClaudeAgentFunctionUrl.FunctionUrl

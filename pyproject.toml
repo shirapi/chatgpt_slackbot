@@ -1,0 +1,19 @@
+[project]
+name = "slackbot"
+version = "0.1.0"
+description = "Slack bot using ChatGPT / Bedrock Claude via LangChain on AWS Lambda"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "slack_bolt",
+    "aiohttp",
+    "boto3",
+    "openai",
+    "langchain",
+    "requests",
+    "tiktoken",
+    "langchain-openai>=1.6.7",
+    "langchain-aws>=1.8.1",
+]
+
+[tool.uv]
+package = false

@@ -4,4 +4,6 @@
 deploy.zsh
 # etc
 .tool-versions
+.venv
+__pycache__/
 .tmp/*
