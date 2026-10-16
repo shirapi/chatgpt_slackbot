@@ -151,8 +151,8 @@ def lambda_handler(event, context):
         data = json.loads(event['body'])
         return {
             'statusCode': 200,
-            'headers': 'Content-Type:application/json',
-            'body': json.dumps(data['challenge'])
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'challenge': data['challenge']})
         }
     slack_handler = SlackRequestHandler(app=app)
     return slack_handler.handle(event, context)
